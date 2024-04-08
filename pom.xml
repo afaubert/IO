@@ -146,6 +146,7 @@
 		</contributor>
 		<contributor><name>Pepijn Van Eeckhoudt</name></contributor>
 		<contributor><name>Guy Williams</name></contributor>
+		<contributor><name>Andre Faubert</name></contributor>
 	</contributors>
 
 	<mailingLists>
@@ -248,5 +249,11 @@
 			<groupId>com.jcraft</groupId>
 			<artifactId>jzlib</artifactId>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>
