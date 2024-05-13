@@ -339,7 +339,7 @@ public class NrrdWriter implements PlugIn {
      * @throws IOException      When writing fails for file-related reasons.
      * @throws NrrdException    When writing cannot be performed due to an invalid file info.
      */
-    protected OutputStream writeRasterData(NrrdFileInfo fi, OutputStream outData) throws IOException, NrrdException {
+    OutputStream writeRasterData(NrrdFileInfo fi, OutputStream outData) throws IOException, NrrdException {
         if (fi.compression == NrrdFileInfo.GZIP)
             outData = new GZIPOutputStream(outData);
         NrrdImageWriter writer = new NrrdImageWriter(fi);
