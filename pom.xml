@@ -146,7 +146,10 @@
 		</contributor>
 		<contributor><name>Pepijn Van Eeckhoudt</name></contributor>
 		<contributor><name>Guy Williams</name></contributor>
-		<contributor><name>Andre Faubert</name></contributor>
+		<contributor>
+			<name>Andre Faubert</name>
+			<properties><id>afaubert</id></properties>
+		</contributor>
 	</contributors>
 
 	<mailingLists>
