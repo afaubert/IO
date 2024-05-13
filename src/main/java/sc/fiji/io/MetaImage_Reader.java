@@ -57,10 +57,10 @@ WARRANTY OF ANY KIND CONCERNING  THE MERCHANTABILITY OF THIS SOFTWARE  OR ITS
 FITNESS FOR ANY PARTICULAR PURPOSE.
 */
 
-////extionsions by Roman Grothausmann:
+////extensions by Roman Grothausmann:
 //01: also handle compressed data with InflaterInputStream
 //02: make mha read correctly: 
-//    1. only feed header to Propoerties.load() because load() interprets unicode escape sequences which are likely to occure in data part
+//    1. only feed header to Properties.load() because load() interprets unicode escape sequences which are likely to occure in data part
 //    2. only feed data to InflaterInputStream, therefore skip header on the exact byte count
 //03: support for not compressed mha, clean up, optimization, ByteOrder fitting ITK, 64bit float support
 
@@ -73,8 +73,6 @@ import ij.io.*;
 
 import java.util.zip.InflaterInputStream;
 import java.net.*;
-import java.awt.image.*;
-import ij.gui.*;
 
 class ExtendedFileOpener extends FileOpener {
     // private class which determines if the file is gzipped or not
@@ -84,7 +82,7 @@ class ExtendedFileOpener extends FileOpener {
     }
    
     public InputStream createInputStream(FileInfo fi) throws IOException, MalformedURLException {
-        // use the method in the FileOpener class to generate an inputstream
+        // use the method in the FileOpener class to generate an input stream
         InputStream is= super.createInputStream(fi);
         if (is!= null && fi.fileName.toLowerCase().endsWith(".zraw")) {
             // then stick a InflaterInputStream on top of it!
@@ -99,7 +97,7 @@ class ExtendedFileOpener extends FileOpener {
             long bc= 0;
             do{
                 line= "";
-                do{ //read a line icluding \n
+                do{ //read a line including \n
                     if((c= is.read()) < 0){
                         IJ.error("Header ended unexpectedly! Aborting at byte: " + bc);
                         System.exit(1);
@@ -244,7 +242,8 @@ public class MetaImage_Reader implements PlugIn {
                 impOut.setStack(null, stackOut);
             }
 	    //handling compressed data
-            else if (fi.compression == FileInfo.COMPRESSION_UNKNOWN){ //sadly there is no FileInfo.GZIP therefore FlexibleFileOpener is used
+            else if (fi.compression == FileInfo.COMPRESSION_UNKNOWN) {
+                //sadly there is no FileInfo.GZIP therefore ExtendedFileOpener is used
                 IJ.showStatus("Reading zlib-compressed " + fi.fileName + "...");
                 //IJ.log("Reading zlib-compressed " + fi.fileName + "...");
 		ExtendedFileOpener opener = new ExtendedFileOpener(fi); //use ExtendedFileOpener which adds ".zraw" as InflaterInputStream to FileOpener
@@ -259,10 +258,7 @@ public class MetaImage_Reader implements PlugIn {
                 impOut = opener.open(false);
             }
         }
-        catch (IOException e) {
-            IJ.error("MetaImage Reader: " + e.getMessage());
-        }
-        catch (NumberFormatException e) {
+        catch (IOException | NumberFormatException e) {
             IJ.error("MetaImage Reader: " + e.getMessage());
         }
         return impOut;

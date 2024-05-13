@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 
 import org.scijava.Context;
@@ -45,7 +46,7 @@ import org.scijava.ui.UIService;
 // Can be user modified so that your own specialised file types
 // can be opened through File ... Open
 // OR by drag and drop onto the ImageJ main panel
-// OR by double clicking in the MacOS 9/X Finder
+// OR by double-clicking in the macOS 9/X Finder
 // -----
 // Go to the point marked MODIFY HERE and modify to
 // recognise and load your own file type
@@ -314,7 +315,7 @@ public class HandleExtraFileTypes extends ImagePlus implements PlugIn {
 					}
 				}
 			}
-			if (-1 != new String(b).toLowerCase().indexOf("trakem2")) {
+			if (new String(b).toLowerCase().contains("trakem2")) {
 				try {
 					// portable way, resists absence of TrakEM2_.jar in the classpath
 					final Class<?> cla = Class.forName("ini.trakem2.Project");
@@ -349,16 +350,15 @@ public class HandleExtraFileTypes extends ImagePlus implements PlugIn {
 			return tryPlugIn("sc.fiji.io.PDF_Viewer", path);
 		}
 
-		// Greg Jefferis: open nrrd images
-		// see Nrrd_Reader code or http://teem.sourceforge.net/nrrd/
+		// Greg Jefferis (improvements by Andre Faubert): open NRRD images
+		// see NrrdReader code or http://teem.sourceforge.net/nrrd/
 		try {
-			final String nrrdMagic = new String(buf, 0, 7, "US-ASCII");
+			final String nrrdMagic = new String(buf, 0, 7, StandardCharsets.US_ASCII);
 			if (nrrdMagic.equals("NRRD000")) {
-				// Ok we've identified the file type - now load it
-				return tryPlugIn("sc.fiji.io.Nrrd_Reader", path);
+				// OK, we've identified the file type - now load it
+				return tryPlugIn("sc.fiji.io.NrrdReader", path);
 			}
-		}
-		catch (final Exception e) {}
+		} catch (final Exception ignored) {}
 		// Greg Jefferis added Torsten Rohlfing binary file handler
 		// ----------------------------------------------
 		// Check if the file ends in .bin or in the case
@@ -376,9 +376,10 @@ public class HandleExtraFileTypes extends ImagePlus implements PlugIn {
 			}
 			final File studyDir = new File(dirWithoutSeparator + ".study");
 
-			if (studyDir.isDirectory())
-			// Ok we've identified the file type - now load it
-			return tryPlugIn("sc.fiji.io.TorstenRaw_GZ_Reader", path);
+			if (studyDir.isDirectory()) {
+				// OK, we've identified the file type - now load it
+				return tryPlugIn("sc.fiji.io.TorstenRaw_GZ_Reader", path);
+			}
 		}
 
 		// Johannes Schindelin: open one or more images in a .ico file
@@ -439,20 +440,18 @@ public class HandleExtraFileTypes extends ImagePlus implements PlugIn {
 			{
 				return tryPlugIn("org.janelia.vaa3d.reader.Vaa3d_Reader", path);
 			}
-		}
-		catch (final Exception exc) {}
+		} catch (final Exception ignored) {}
 
 		// Michael Doube: read Scanco ISQ files
 		// File name is ADDDDDDD.ISQ;D where D is a decimal and A is a letter
 		try {
-			final String isqMagic = new String(buf, 0, 16, "UTF-8");
+			final String isqMagic = new String(buf, 0, 16, StandardCharsets.UTF_8);
 			if (name.matches("[a-z]\\d{7}.isq;\\d+") ||
 				isqMagic.equals("CTDATA-HEADER_V1"))
 			{
 				return tryPlugIn("org.bonej.io.ISQReader", path);
 			}
-		}
-		catch (final Exception e) {}
+		} catch (final Exception ignored) {}
 
 		// Larry Lindsey: open Archipelago cluster configuration file
 		if (name.endsWith(".arc")) {
@@ -533,8 +532,7 @@ public class HandleExtraFileTypes extends ImagePlus implements PlugIn {
 						width = IMAGE_OPENED;
 						return null;
 					}
-				}
-				catch (final Exception exc) {}
+				} catch (final Exception ignored) {}
 			}
 		}
 
@@ -554,8 +552,7 @@ public class HandleExtraFileTypes extends ImagePlus implements PlugIn {
 					}
 				}
 			}
-		}
-		catch (final IOException exc) {
+		} catch (final IOException ignored) {
 			// NB: Fail silently. :'-(
 		}
 
@@ -574,8 +571,7 @@ public class HandleExtraFileTypes extends ImagePlus implements PlugIn {
 			final ImagePlus imp = (ImagePlus) o;
 			if (imp.getWidth() == 0) o = null; // invalid image
 			else width = IMAGE_OPENED; // success
-		}
-		else if (o != null) {
+		} else if (o != null) {
 			// plugin was run but does not extend ImagePlus; assume success
 			width = IMAGE_OPENED;
 		} // ... else plugin was not run/found
